@@ -21,7 +21,6 @@ def run():
     clock = pygame.time.Clock()
     pygame.display.set_caption(gameTitle)
     screen = pygame.display.set_mode((screenWidth, screenHeight))
-    manImg = pygame.image.load('man.png')
     ballImg = pygame.image.load('snowball.png')
     shadowImg = pygame.image.load('shadow.png')
     x = 600
@@ -38,7 +37,18 @@ def run():
     minimumSize = 15
     maximumSize = 50
     #Changeable stuff
+
     
+    all_sprites_list = pygame.sprite.Group()
+    
+    player = man()
+    player.rect.x = 600
+    player.rect.y = 300
+    all_sprites_list.add(player)
+    enemy = man()
+    enemy.rect.x = 700
+    enemy.rect.y = 300
+    all_sprites_list.add(enemy)
 
     lineClock = 0
     heightLineClock = 0
@@ -52,14 +62,11 @@ def run():
     lineSizeStop =  False
     lineDoneStop = False
     heightAngle = 0
-
-    ballX = x + 25
-    ballY = y + 15
     height = 0.5
     gravity = 4
     timer = 0
-
     
+
     while close == False:
         for event in pygame.event.get():
             
@@ -74,10 +81,15 @@ def run():
                     elif lineDoneStop == False:
                         lineDoneStop = True
                         initialHSpeed = lineSize*-math.cos(heightAngle)/2
+                        ball = snowball()
+                        ballX = 625
+                        ballY = 315
+                        all_sprites_list.add(ball)
         clock.tick(fps)
         screen.fill(white)
-        man(x,y, screen, manImg)
-
+        all_sprites_list.update()
+        all_sprites_list.draw(screen)
+        
         if lineDoneStop == False:
             if lineAngleStop == False:
                 
@@ -121,13 +133,13 @@ def run():
                 height += initialHSpeed - gravity*timer
                 ballX += lineSize*math.sin(angle)*timer/100
                 ballY += lineSize*math.cos(angle)*timer/100
-                font = pygame.font.Font('freesansbold.ttf', 115)
-                screen.blit(font.render(str(height), True, (0,0,0)), (0,0))
-                screen.blit(shadowImg,(ballX+height*0.01,ballY+height*0.005))
-            
-                
-            
-            screen.blit(ballImg,(ballX,ballY))
+                font = pygame.font.Font('freesansbold.ttf', 20)
+                screen.blit(font.render(str(ballX), True, (0,0,0)), (0,0))
+                screen.blit(shadowImg,(ball.rect.x+height*0.01,+ball.rect.y+height*0.005))
+                ball.rect.x = ballX
+                ball.rect.y = ballY
+            elif ball.collides(enemy):
+                pygame.quit()
         
         pygame.display.update()
         
@@ -135,9 +147,27 @@ def run():
 
     
 
-def man(x,y,z, w):
-    z.blit(w,(x,y))
+
+class snowball(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.x = 0
+        self.y = 0
+        self.image = pygame.image.load('snowball.png')
+        self.rect = self.image.get_rect()
+    def collides(self, sprite):
+        return self.rect.colliderect(sprite.rect)
 
 
+    
+class man(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
 
+        self.x = 0
+        self.y = 0
+        self.image = pygame.image.load('man.png')
+        self.rect = self.image.get_rect()
+        
 main()
