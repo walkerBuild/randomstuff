@@ -72,6 +72,20 @@ class snowball(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
 
+
+class cantTouchThis(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.id = 'sb'
+        self.x = 0
+        self.y = 0
+        self.image = pygame.image.load('cantTouch.png')
+        self.rect = self.image.get_rect()
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+    def hammertime(self):
+        self.image = pygame.image.load('hammertime.png')
+
 class bullet(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -107,7 +121,9 @@ class gun(pygame.sprite.Sprite):
     def reset(self):
         self.image = pygame.image.load('gun.png')
     def swap(self):
+        self.image = pygame.image.load('gun.png')
         self.image = pygame.transform.flip(self.image,True,False)
+        
 
 
 class powerBar(pygame.sprite.Sprite):
@@ -664,6 +680,10 @@ def mainMenu():
     helpBut.rect.y = 300
     isInHelp = False
 
+    cantTouch = cantTouchThis()
+    cantTouch.rect.x = random.randint(0,400)
+    cantTouch.rect.y = random.randint(200,550)
+    touchCount = 0
     
     while (leaveMenu == False):
         for event in pygame.event.get():
@@ -679,8 +699,19 @@ def mainMenu():
         text = font.render("SNOWBALL FIGHT", 1, (0, 0, 0))
         tWidth = text.get_width()
         screen.blit(font.render("SNOWBALL FIGHT", True, black), ((screenWidth/2)-tWidth/2,60))
-    
         mouse = pygame.mouse.get_pos()
+
+        if cantTouch.rect.collidepoint(mouse):
+            if(clicked[0] == 1):
+                if(touchCount<3):
+                    touchCount+=1
+                    cantTouch.rect.x = random.randint(0,400)
+                    cantTouch.rect.y = random.randint(200,550)
+                else:
+                    cantTouch.hammertime()
+            
+    
+        
         if playButton.rect.collidepoint(mouse):
             if(clicked[0] == 1):
                 userChoice=playerSelection()
@@ -727,7 +758,8 @@ def mainMenu():
             if(isInLeave):    
                leaveBut.unhighlight()
                isInLeave = False
-            
+
+        cantTouch.draw(screen)
         playButton.draw(screen)
         credBut.draw(screen)
         helpBut.draw(screen)
@@ -1224,16 +1256,16 @@ arrowHeight = arrowObj.rect.height
 arrowWidth = arrowObj.rect.width
 
 
-extraUp = [True, True]
+extraUp = [False, False]
 extraInButton = False
 extraActivated = [False, False]
-chillUp = [True, True]
+chillUp = [False, False]
 chillInButton = False
 chillActivated = [False, False]
-gunUp = [True, True]
+gunUp = [False, False]
 gunInButton = False
 gunActivated = [False, False]
-potionUp = [True, True]
+potionUp = [False, False]
 potionInButton = False
 potionActivated = [False, False]
 
@@ -1270,7 +1302,7 @@ isInButton = False
 gameEnded = False
 angle=0
 textToSay = "Select Player"
-
+gunConstant = 0
 
 userChoice = mainMenu()
 
@@ -1298,8 +1330,7 @@ player[4].flip()
 player[5].flip()
 
 
-player[4].kill()
-player[5].kill()
+
 
 while close == False:
 
@@ -1330,7 +1361,7 @@ while close == False:
                         lineDoneStop = True
                         initialHSpeed = abs(lineSize*math.cos(heightAngle-angle)/2)
                         ballX = player[selectedPlayer+currentTurn*3].rect.x + 25
-                        ballY = player[selectedPlayer+currentTurn*3].rect.y + 15
+                        ballY = player[selectedPlayer+currentTurn*3].rect.y + 50
                         pygame.mixer.Sound.play(snowThrow)
         if event.type == pygame.MOUSEBUTTONUP:
             buttonUp = True
@@ -1349,7 +1380,7 @@ while close == False:
                             heightAngle = heightLineClock*2*math.pi/lineHeightTime + angle
                         initialHSpeed = abs(lineSize*math.cos(heightAngle-angle)/2)
                         ballX = player[selectedPlayer+currentTurn*3].rect.x + 25
-                        ballY = player[selectedPlayer+currentTurn*3].rect.y + 15
+                        ballY = player[selectedPlayer+currentTurn*3].rect.y + 50
                         pygame.mixer.Sound.play(snowThrow)
 
     clicked = pygame.mouse.get_pressed()
@@ -1380,7 +1411,8 @@ while close == False:
                             player[i+currentTurn*3].reviveWoman()
                         elif(player[i+currentTurn*3].isAlien):
                             player[i+currentTurn*3].reviveAlien()
-                            
+                        if(currentTurn==1):
+                            player[i+currentTurn*3].flip()
                         potionActivated[currentTurn] = False
                         waitingForRevive = False
                         textToSay = "Select Player"
@@ -1417,8 +1449,12 @@ while close == False:
             if lineDoneStop == False:
         
                 if gunActivated[currentTurn]:
-                    gunObj.rect.x = player[selectedPlayer+currentTurn*3].rect.x
-                    gunObj.rect.y = player[selectedPlayer+currentTurn*3].rect.y+10
+                    gunConstant = 30
+                    if(currentTurn==0):
+                        gunObj.rect.x = player[selectedPlayer+currentTurn*3].rect.x + 60
+                    else:
+                        gunObj.rect.right = player[selectedPlayer+currentTurn*3].rect.x -60 + player[0].rect.width
+                    gunObj.rect.y = player[selectedPlayer+currentTurn*3].rect.y+50
                     gunList.update()
                     gunList.draw(screen)
                 
@@ -1438,9 +1474,10 @@ while close == False:
                 if (lineAngleStop == True) and (gunActivated[currentTurn]):
                     lineSizeStop = True
                     lineDoneStop = True
-                    ballX = player[selectedPlayer+currentTurn*3].rect.x+25
-                    ballY = player[selectedPlayer+currentTurn*3].rect.y+15
+                    ballX = player[selectedPlayer+currentTurn*3].rect.x+60*currentDirection+player[0].rect.width*currentTurn+gunConstant*currentDirection
+                    ballY = player[selectedPlayer+currentTurn*3].rect.y+50
                     bull.rotate(math.degrees(angle-math.pi/2), ballX, ballY)
+                    gunConstant = 0
                     pygame.mixer.Sound.play(gunShot)
                     
                 if (lineAngleStop == True) and (lineSizeStop == False):
@@ -1464,7 +1501,7 @@ while close == False:
                         heightAngle -= heightBoundary
                     yAngleLine = lineSize * math.cos(heightAngle)
                     xAngleLine = lineSize * math.sin(heightAngle)
-                    pygame.draw.line(screen, black, (player[selectedPlayer+currentTurn*3].rect.x+25, player[selectedPlayer+currentTurn*3].rect.y+15), (trueX + player[selectedPlayer+currentTurn*3].rect.x + 25, trueY + player[selectedPlayer+currentTurn*3].rect.y + 20), 4)
+                    pygame.draw.line(screen, black, (player[selectedPlayer+currentTurn*3].rect.x+60*currentDirection+player[0].rect.width*currentTurn, player[selectedPlayer+currentTurn*3].rect.y+50), (trueX + player[selectedPlayer+currentTurn*3].rect.x + 60*currentDirection+player[0].rect.width*currentTurn, trueY + player[selectedPlayer+currentTurn*3].rect.y + 50), 4)
                 yLine = lineSize * math.cos(angle)
                 xLine = lineSize * math.sin(angle)
 
@@ -1474,18 +1511,21 @@ while close == False:
                 
 
                 if(not lineAngleStop):
+
+                    yConstant=50
+
                     
                     if(currentTurn==0):
                         arrowObj.reset()
-                        arrowObj.rotate(math.degrees(abs(angle-math.pi/2)), player[selectedPlayer+currentTurn*3].rect.x+25, player[selectedPlayer+currentTurn*3].rect.y+15-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight)
+                        arrowObj.rotate(math.degrees(abs(angle-math.pi/2)), player[selectedPlayer+currentTurn*3].rect.x+gunConstant*currentDirection+60*currentDirection+player[0].rect.width*currentTurn, player[selectedPlayer+currentTurn*3].rect.y+yConstant-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight)
                         if(angle-math.pi/2 -currentTurn*math.pi)<0:
-                            arrowObj.flip(player[selectedPlayer+currentTurn*3].rect.y+15-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight+arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi)))
+                            arrowObj.flip(player[selectedPlayer+currentTurn*3].rect.y+yConstant-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight+arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi)))
                         
                     else:
                         arrowObj.resetLeft()
-                        arrowObj.rotateLeft(math.degrees(-abs(angle-3*math.pi/2)), player[selectedPlayer+currentTurn*3].rect.x+25, player[selectedPlayer+currentTurn*3].rect.y+15-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight)
+                        arrowObj.rotateLeft(math.degrees(-abs(angle-3*math.pi/2)), player[selectedPlayer+currentTurn*3].rect.x+gunConstant*currentDirection+60*currentDirection+player[0].rect.width*currentTurn, player[selectedPlayer+currentTurn*3].rect.y+yConstant-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight)
                         if(angle-math.pi/2 -currentTurn*math.pi)<0:
-                            arrowObj.flip(player[selectedPlayer+currentTurn*3].rect.y+15-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight+arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi)))
+                            arrowObj.flip(player[selectedPlayer+currentTurn*3].rect.y+yConstant-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight+arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi)))
                 arrowList.update()
                 arrowList.draw(screen)
 
@@ -1495,9 +1535,9 @@ while close == False:
                     power.reset()
                     power.scale((lineSize/maximumSize)*power.rect.width,powerHeight)
                     powerHold.rect.x = player[selectedPlayer+currentTurn*3].rect.x - player[selectedPlayer+currentTurn*3].rect.width/2
-                    powerHold.rect.y = player[selectedPlayer+currentTurn*3].rect.y + 60
+                    powerHold.rect.y = player[selectedPlayer+currentTurn*3].rect.y + 80
                     power.rect.x = player[selectedPlayer+currentTurn*3].rect.x - player[selectedPlayer+currentTurn*3].rect.width/2
-                    power.rect.y = player[selectedPlayer+currentTurn*3].rect.y + 60
+                    power.rect.y = player[selectedPlayer+currentTurn*3].rect.y + 80
                 
                     pwBarList.update()
                     pwBarList.draw(screen)
@@ -1532,7 +1572,7 @@ while close == False:
                         for i in range(0,3):
                             if (ball.collides(gifts[i]) and ball.rect.bottom>=100):
                                 pygame.mixer.Sound.play(presentSound)
-                                obtainedItem = randomItem(extraUp[swapTurn(currentTurn)],chillUp[swapTurn(currentTurn)],gunUp[swapTurn(currentTurn)],extraUp[swapTurn(currentTurn)])
+                                obtainedItem = randomItem(extraUp[swapTurn(currentTurn)],chillUp[swapTurn(currentTurn)],gunUp[swapTurn(currentTurn)],potionUp[swapTurn(currentTurn)])
                                 if obtainedItem==0:
                                     extraUp[swapTurn(currentTurn)] = True
                                 if obtainedItem==1:
@@ -1547,7 +1587,8 @@ while close == False:
                                 if(player[currentTurn*3].isDead) and (player[1+currentTurn*3].isDead) and (player[2+currentTurn*3].isDead):
                                     #RESET GAME
                                     pygame.mixer.Sound.play(gameEnd)
-                                    userChoice = gameOver(userChoice[currentTurn])
+                                    newUserChoice = gameOver(userChoice[currentTurn])
+                                    
                                     
                                     for i in range(0,6):
                                         if(player[i].isDead):
@@ -1560,7 +1601,8 @@ while close == False:
                                             if(i>=2):
                                                 player[i].flip()
 
-                                    if not(userChoice[0]==-1):
+                                    if not(newUserChoice[0]==-1):
+                                        userChice = newUserChoice
                                         if(userChoice[0]==0):
                                             player[0].becomeMan()
                                             player[1].becomeMan()
@@ -1591,6 +1633,8 @@ while close == False:
                                         player[3].flip()
                                         player[4].flip()
                                         player[5].flip()
+
+
 
                                         
                                     extraUp = [False, False]
@@ -1670,7 +1714,7 @@ while close == False:
                             if(player[swapTurn(currentTurn)*3].isDead) and (player[1+swapTurn(currentTurn)*3].isDead) and (player[2+swapTurn(currentTurn)*3].isDead):
                                 print("hi")
                                 pygame.mixer.Sound.play(gameEnd)
-                                userChoice = gameOver(userChoice[currentTurn])
+                                newUserChoice = gameOver(userChoice[currentTurn])
                                 #RESET GAME
                                 for i in range(0,6):
                                     if(player[i].isDead):
@@ -1683,7 +1727,8 @@ while close == False:
                                         if(i>=2):
                                             player[i].flip()
 
-                                if not(userChoice[0]==-1):
+                                if not(newUserChoice[0]==-1):
+                                    userChoice = newUserChoice
                                     if(userChoice[0]==0):
                                         player[0].becomeMan()
                                         player[1].becomeMan()
@@ -1901,7 +1946,17 @@ while close == False:
             
     font = pygame.font.Font('freesansbold.ttf', 20)
     if playerChosen == False:
-        screen.blit(font.render(str(textToSay), True, black), (0,0))
+        if(textToSay=="Select Player"):
+            if(userChoice[0]==userChoice[1]):
+                textToSay = "Team " + str(currentTurn+1) + ": Select Player"
+            else:
+                if(userChoice[currentTurn]==0):
+                    textToSay = "Men: Select Player"
+                if(userChoice[currentTurn]==1):
+                    textToSay = "Women: Select Player"
+                if(userChoice[currentTurn]==2):
+                    textToSay = "Aliens: Select Player"  
+        screen.blit(font.render(str(textToSay), True, black), (10,10))
 
     pygame.display.update()
         
