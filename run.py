@@ -145,6 +145,17 @@ class powerHolder(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
+class instructions(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.id = 'instructions'
+        self.x = 0
+        self.y = 0
+        self.image = pygame.image.load('instructions.png')
+        self.rect = self.image.get_rect()
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
 
 class arrow(pygame.sprite.Sprite):
     def __init__(self):
@@ -238,10 +249,17 @@ class man(pygame.sprite.Sprite):
         self.image = pygame.image.load('woman.png')
         self.isMan = False
         self.isWoman = True
+        self.isAlien = False
     def becomeAlien(self):
         self.image = pygame.image.load('alien.png')
         self.isMan = False
         self.isAlien = True
+        self.isWoman = False
+    def becomeMan(self):
+        self.image = pygame.image.load('man.png')
+        self.isMan = True
+        self.isWoman = False
+        self.isAlien = False
 
         
 class button(pygame.sprite.Sprite):
@@ -258,6 +276,22 @@ class button(pygame.sprite.Sprite):
         self.image = pygame.image.load('mouseplay.png')
     def unhighlight(self):
         self.image = pygame.image.load('play.png')
+
+
+class helpButton(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.id = 'help'
+        self.x = 0
+        self.y = 0
+        self.image = pygame.image.load('helpButton.png')
+        self.rect = self.image.get_rect()
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+    def highlight(self):
+        self.image = pygame.image.load('helpButtonOver.png')
+    def unhighlight(self):
+        self.image = pygame.image.load('helpButton.png')
 
 
 class againButton(pygame.sprite.Sprite):
@@ -528,11 +562,11 @@ def leaveScreen():
     leaveMenu = False
     playButton = noButton()
     playButton.reset()
-    playButton.rect.x = 600
+    playButton.rect.x = screenWidth/2 - playButton.rect.width/2 + 100
     playButton.rect.y = 200
     isInButton = False
     credBut = yesButton()
-    credBut.rect.x = 500
+    credBut.rect.x = screenWidth/2 - playButton.rect.width/2 - 100
     credBut.rect.y = 200
     isInCredits = False
     question = "Are you sure you want to leave?"
@@ -543,9 +577,11 @@ def leaveScreen():
     while (leaveMenu == False):
 
         clicked = pygame.mouse.get_pressed()
-        screen.fill(white);
+        screen.fill(grey);
         font = pygame.font.Font('freesansbold.ttf', 50)
-        screen.blit(font.render(question, True, (0,0,0)), (0,0))
+        text = font.render(question, 1, (0, 0, 0))
+        tWidth = text.get_width()
+        screen.blit(font.render(question, True, black), ((screenWidth/2)-tWidth/2,50))
         mouse = pygame.mouse.get_pos()
         
         for event in pygame.event.get():
@@ -565,7 +601,7 @@ def leaveScreen():
                         secondQuestion = True
                     elif(not thirdQuestion):
                         thirdQuestion = True
-                        question = "I'm sorry Dave, I'm afraid I can't do that"
+                        question = "I'm sorry Dave, I'm afraid I can't do that."
                         playButton.turnOK()
                         playButton.rect.x = 550
                         playButton.rect.y = 200
@@ -612,17 +648,21 @@ def mainMenu():
     
     leaveMenu = False
     playButton = button()
-    playButton.rect.x = 600
-    playButton.rect.y = 200
+    playButton.rect.x = screenWidth/2 - playButton.rect.width/2
+    playButton.rect.y = 250
     isInButton = False
     credBut = creditButton()
-    credBut.rect.x = 500
-    credBut.rect.y = 200
+    credBut.rect.x = screenWidth/2 - playButton.rect.width/2
+    credBut.rect.y = 350
     isInCredits = False
     leaveBut = quitButton()
-    leaveBut.rect.x = 400
-    leaveBut.rect.y = 200
+    leaveBut.rect.x = screenWidth/2 - playButton.rect.width/2
+    leaveBut.rect.y = 400
     isInLeave = False
+    helpBut = helpButton()
+    helpBut.rect.x = screenWidth/2 - playButton.rect.width/2
+    helpBut.rect.y = 300
+    isInHelp = False
 
     
     while (leaveMenu == False):
@@ -634,13 +674,18 @@ def mainMenu():
                 pygame.quit()
                 quit()
         clicked = pygame.mouse.get_pressed()
-        screen.fill(white);
+        screen.fill(grey);
         font = pygame.font.Font('freesansbold.ttf', 100)
-        screen.blit(font.render(str("SNOWBALL FIGHT"), True, (0,0,0)), (0,0))
+        text = font.render("SNOWBALL FIGHT", 1, (0, 0, 0))
+        tWidth = text.get_width()
+        screen.blit(font.render("SNOWBALL FIGHT", True, black), ((screenWidth/2)-tWidth/2,60))
+    
         mouse = pygame.mouse.get_pos()
         if playButton.rect.collidepoint(mouse):
             if(clicked[0] == 1):
-                leaveMenu=True
+                userChoice=playerSelection()
+                if not(userChoice[0]==-1):
+                    leaveMenu=True
             if(not isInButton): 
                playButton.highlight()
                isInButton = True
@@ -660,6 +705,18 @@ def mainMenu():
                credBut.unhighlight()
                isInCredits = False
 
+
+        if helpBut.rect.collidepoint(mouse):
+            if(clicked[0] == 1):
+                instructionScreen()
+            if(not isInHelp): 
+               helpBut.highlight()
+               isInHelp = True
+        if not(helpBut.rect.collidepoint(mouse)):
+            if(isInHelp):    
+               helpBut.unhighlight()
+               isInHelp = False
+
         if leaveBut.rect.collidepoint(mouse):
             if(clicked[0] == 1):
                 leaveScreen()
@@ -673,15 +730,16 @@ def mainMenu():
             
         playButton.draw(screen)
         credBut.draw(screen)
+        helpBut.draw(screen)
         leaveBut.draw(screen)
         pygame.display.update()
         clock.tick(fps)
-    
+    return userChoice   
 
 def creditScreen():
     leaveMenu = False
     menuBut = backButton()
-    menuBut.rect.x = 800
+    menuBut.rect.x =  screenWidth/2 - menuBut.rect.width/2
     menuBut.rect.y = 500
     isInButton = False
 
@@ -696,11 +754,18 @@ def creditScreen():
                 quit()
         clicked = pygame.mouse.get_pressed()
         
-        screen.fill(white)
+        screen.fill(grey)
+        font = pygame.font.Font('freesansbold.ttf', 50)
+        text = font.render("Who checks the credits anyway?", 1, (0, 0, 0))
+        tWidth = text.get_width()
+        screen.blit(font.render(str("Who checks the credits anyway?"), True, black), ((screenWidth/2)-tWidth/2,50))
         font = pygame.font.Font('freesansbold.ttf', 20)
-        screen.blit(font.render(str("Who checks the credits anyway?"), True, (0,0,0)), (0,0))
-        screen.blit(font.render(str("Raul sozcos()"), True, (0,0,0)), (0,60))
-        screen.blit(font.render(str("Formiga Ferrera"), True, (0,0,0)), (0,100))
+        text = font.render("Raul sozcos()", 1, (0, 0, 0))
+        tWidth = text.get_width()
+        screen.blit(font.render(str("Raul sozcos()"), True, black), ((screenWidth/2)-tWidth/2,150))
+        text = font.render("Formiga Ferrera", 1, (0, 0, 0))
+        tWidth = text.get_width()
+        screen.blit(font.render(str("Formiga Ferrera"), True, black), ((screenWidth/2)-tWidth/2,180))
 
         mouse = pygame.mouse.get_pos()
         if menuBut.rect.collidepoint(mouse):
@@ -718,18 +783,58 @@ def creditScreen():
         menuBut.draw(screen)
         pygame.display.update()
         clock.tick(fps)
+
+def instructionScreen():
+    leaveMenu = False
+    menuBut = backButton()
+    menuBut.rect.x = screenWidth/2 - menuBut.rect.width/2
+    menuBut.rect.y = 520
+    isInButton = False
+    instruct = instructions()
+    instruct.rect.x = 0
+    instruct.rect.y = 0
+    
+    while (leaveMenu == False):
+        for event in pygame.event.get():
+            if event.type == firstOver:
+                pygame.mixer.music.load('loopsong.ogg')
+                pygame.mixer.music.play(-1)
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        clicked = pygame.mouse.get_pressed()
+        
+        screen.fill(white)
+
+        mouse = pygame.mouse.get_pos()
+        if menuBut.rect.collidepoint(mouse):
+            if(clicked[0] == 1):
+                leaveMenu=True
+                
+            if(not isInButton): 
+               menuBut.highlight()
+               isInButton = True
+        if not(menuBut.rect.collidepoint(mouse)):
+            if(isInButton):    
+               menuBut.unhighlight()
+               isInButton = False
+
+        instruct.draw(screen)
+        menuBut.draw(screen)
+        pygame.display.update()
+        clock.tick(fps)
     
     
-def gameOver():
+def gameOver(winner):
 
     pygame.mixer.music.stop()
-    
+    userChoice = [-1,-1]
     leaveMenu = False
     againBut = againButton()
-    againBut.rect.x = 400
+    againBut.rect.x = screenWidth/2 - againBut.rect.width/2 - 50
     againBut.rect.y = 300
     menuBut = menuButton()
-    menuBut.rect.x = 800
+    menuBut.rect.x = screenWidth/2 - againBut.rect.width/2 + 50
     menuBut.rect.y = 300
     isInButton = False
     isInMenu = False
@@ -739,9 +844,27 @@ def gameOver():
                 pygame.quit()
                 quit()
         clicked = pygame.mouse.get_pressed()
-        screen.fill(white)
-        font = pygame.font.Font('freesansbold.ttf', 100)
-        screen.blit(font.render(str("GAME OVER"), True, (0,0,0)), (0,0))
+        screen.fill(grey)
+        font = pygame.font.Font('freesansbold.ttf', 70)
+        text = font.render("GAME OVER", 1, (0, 0, 0))
+        tWidth = text.get_width()
+        screen.blit(font.render(str("GAME OVER"), True, black), ((screenWidth/2)-tWidth/2,100))
+
+        if(winner==0):
+            font = pygame.font.Font('freesansbold.ttf', 40)
+            text = font.render("Men are superior.", 1, (0, 0, 0))
+            tWidth = text.get_width()
+            screen.blit(font.render(str("Men are superior."), True, black), ((screenWidth/2)-tWidth/2,200))            
+        elif(winner==1):
+            font = pygame.font.Font('freesansbold.ttf', 40)
+            text = font.render("Women are superior.", 1, (0, 0, 0))
+            tWidth = text.get_width()
+            screen.blit(font.render(str("Women are superior."), True, black), ((screenWidth/2)-tWidth/2,200))            
+        elif(winner==2):
+            font = pygame.font.Font('freesansbold.ttf', 40)
+            text = font.render("Aliens are superior.", 1, (0, 0, 0))
+            tWidth = text.get_width()
+            screen.blit(font.render(str("Aliens are superior."), True, black), ((screenWidth/2)-tWidth/2,200))                  
         mouse = pygame.mouse.get_pos()
         if againBut.rect.collidepoint(mouse):
             if(clicked[0] == 1):
@@ -770,7 +893,7 @@ def gameOver():
                 pygame.mixer.music.load('firstsong.ogg')
                 pygame.mixer.music.set_volume(0.15)
                 pygame.mixer.music.play()
-                mainMenu()
+                userChoice = mainMenu()
                 leaveMenu = True
                 
             if(not isInMenu): 
@@ -785,27 +908,50 @@ def gameOver():
         menuBut.draw(screen)
         pygame.display.update()
         clock.tick(fps)  
-
+    return userChoice
 
 
 
 def playerSelection():
+
+    
     leaveMenu = False
     otherBut = otherButton()
-    otherBut.rect.x = 100
-    otherBut.rect.y = 200
+    otherBut.rect.right = 1000
+    otherBut.rect.y = 120
+    manBut = manButton()
+    manBut.rect.x = 200
+    manBut.rect.y = 120
+    womanBut = womanButton()
+    womanBut.rect.x = screenWidth/2 - womanBut.rect.width/2
+    womanBut.rect.y = 120
     menuBut = backButton()
-    menuBut.rect.x = 200
+    menuBut.rect.x = screenWidth/2 - menuBut.rect.width/2 - 50
     menuBut.rect.y = 500
     nextBut = nextButton()
-    nextBut.rect.x = 800
+    nextBut.rect.x = screenWidth/2 - menuBut.rect.width/2 + 50
     nextBut.rect.y = 500
+
+    
+    secotherBut = otherButton()
+    secotherBut.rect.right = 1000
+    secotherBut.rect.y = 320
+    secmanBut = manButton()
+    secmanBut.rect.x = 200
+    secmanBut.rect.y = 320
+    secwomanBut = womanButton()
+    secwomanBut.rect.x = screenWidth/2 - womanBut.rect.width/2
+    secwomanBut.rect.y = 320
+
+    
     isInMan = [True, True]
     isInOther = [False, False]
     isInWoman = [False, False]
     isInButton = False
     isInNext = False
-
+    userChoice = [0, 0]
+    manBut.highlight()
+    secmanBut.highlight()
     
     while (leaveMenu == False):
         for event in pygame.event.get():
@@ -817,10 +963,14 @@ def playerSelection():
                 quit()
         clicked = pygame.mouse.get_pressed()
         
-        screen.fill(white)
-        font = pygame.font.Font('freesansbold.ttf', 20)
-        screen.blit(font.render(str("Team 1:"), True, (0,0,0)), (0,0))
-        screen.blit(font.render(str("Team 2:"), True, (0,0,0)), (0,200))
+        screen.fill(grey)
+        font = pygame.font.Font('freesansbold.ttf', 40)
+        text = font.render("Team 1:", 1, (0, 0, 0))
+        tWidth = text.get_width()
+        screen.blit(font.render(str("Team 1:"), True, black), ((screenWidth/2)-tWidth/2,50))
+        text = font.render("Team 2:", 1, (0, 0, 0))
+        tWidth = text.get_width()
+        screen.blit(font.render(str("Team 2:"), True, black), ((screenWidth/2)-tWidth/2,250))
 
         mouse = pygame.mouse.get_pos()
 
@@ -828,6 +978,8 @@ def playerSelection():
         if menuBut.rect.collidepoint(mouse):
             if(clicked[0] == 1):
                 leaveMenu=True
+                userChoice[0] = -1
+                return userChoice
             if(not isInButton): 
                menuBut.highlight()
                isInButton = True
@@ -836,8 +988,63 @@ def playerSelection():
                menuBut.unhighlight()
                isInButton = False
 
+        if nextBut.rect.collidepoint(mouse):
+            if(clicked[0] == 1):
+                leaveMenu=True
+                return userChoice
+            if(not isInNext): 
+               nextBut.highlight()
+               isInNext = True
+        if not(nextBut.rect.collidepoint(mouse)):
+            if(isInNext):    
+               nextBut.unhighlight()
+               isInNext = False
+
+        if womanBut.rect.collidepoint(mouse):
+            if(clicked[0] == 1):
+                womanBut.highlight()
+                manBut.unhighlight()
+                otherBut.unhighlight()
+                userChoice[0] = 1
+        elif manBut.rect.collidepoint(mouse):
+            if(clicked[0] == 1):
+                userChoice[0] = 0
+                manBut.highlight()
+                womanBut.unhighlight()
+                otherBut.unhighlight()
+        elif otherBut.rect.collidepoint(mouse):
+            if(clicked[0] == 1):
+                userChoice[0] = 2
+                manBut.unhighlight()
+                womanBut.unhighlight()
+                otherBut.highlight()
+
+        if secwomanBut.rect.collidepoint(mouse):
+            if(clicked[0] == 1):
+                secwomanBut.highlight()
+                secmanBut.unhighlight()
+                secotherBut.unhighlight()
+                userChoice[1] = 1
+        elif secmanBut.rect.collidepoint(mouse):
+            if(clicked[0] == 1):
+                userChoice[1] = 0
+                secmanBut.highlight()
+                secwomanBut.unhighlight()
+                secotherBut.unhighlight()
+        elif secotherBut.rect.collidepoint(mouse):
+            if(clicked[0] == 1):
+                userChoice[1] = 2
+                secmanBut.unhighlight()
+                secwomanBut.unhighlight()
+                secotherBut.highlight()
+                
         menuBut.draw(screen)
         otherBut.draw(screen)
+        manBut.draw(screen)
+        womanBut.draw(screen)
+        secotherBut.draw(screen)
+        secmanBut.draw(screen)
+        secwomanBut.draw(screen)
         nextBut.draw(screen)
         pygame.display.update()
         clock.tick(fps)
@@ -847,9 +1054,9 @@ def playerSelection():
 screenWidth = 1200
 screenHeight = 600
 gameTitle = "Snowball Fight"
-white = (255,255,255)
-black = (0, 0, 0)
-green = (20, 200, 20)
+white = (248,243,237)
+black = (54, 51, 47)
+grey = (105, 102, 98)
 close = False
 fps = 30
 
@@ -937,30 +1144,6 @@ player[5].rect.right = screenWidth-distanceToBorder
 player[5].rect.bottom = screenHeight - distanceToHeight
 
 
-userChoice = [1, 2]
-
-if(userChoice[0]==1):
-    player[0].becomeWoman()
-    player[1].becomeWoman()
-    player[2].becomeWoman()
-elif(userChoice[1]==2):
-    player[0].becomeAlien()
-    player[1].becomeAlien()
-    player[2].becomeAlien()
-
-
-if(userChoice[1]==1):
-    player[3].becomeWoman()
-    player[4].becomeWoman()
-    player[5].becomeWoman()
-elif(userChoice[1]==2):
-    player[3].becomeAlien()
-    player[4].becomeAlien()
-    player[5].becomeAlien()
-
-player[3].flip()
-player[4].flip()
-player[5].flip()
 
 
 
@@ -1041,16 +1224,16 @@ arrowHeight = arrowObj.rect.height
 arrowWidth = arrowObj.rect.width
 
 
-extraUp = [True, False]
+extraUp = [True, True]
 extraInButton = False
 extraActivated = [False, False]
-chillUp = [True, False]
+chillUp = [True, True]
 chillInButton = False
 chillActivated = [False, False]
 gunUp = [True, True]
 gunInButton = False
 gunActivated = [False, False]
-potionUp = [True, False]
+potionUp = [True, True]
 potionInButton = False
 potionActivated = [False, False]
 
@@ -1088,12 +1271,35 @@ gameEnded = False
 angle=0
 textToSay = "Select Player"
 
-playerSelection()
-mainMenu()
+
+userChoice = mainMenu()
+
+if(userChoice[0]==1):
+    player[0].becomeWoman()
+    player[1].becomeWoman()
+    player[2].becomeWoman()
+elif(userChoice[0]==2):
+    player[0].becomeAlien()
+    player[1].becomeAlien()
+    player[2].becomeAlien()
 
 
+if(userChoice[1]==1):
+    player[3].becomeWoman()
+    player[4].becomeWoman()
+    player[5].becomeWoman()
+elif(userChoice[1]==2):
+    player[3].becomeAlien()
+    player[4].becomeAlien()
+    player[5].becomeAlien()
+
+player[3].flip()
+player[4].flip()
+player[5].flip()
 
 
+player[4].kill()
+player[5].kill()
 
 while close == False:
 
@@ -1326,7 +1532,7 @@ while close == False:
                         for i in range(0,3):
                             if (ball.collides(gifts[i]) and ball.rect.bottom>=100):
                                 pygame.mixer.Sound.play(presentSound)
-                                obtainedItem = randomItem(extraUp[swapTurn(currentTurn)],chillUp[swapTurn(currentTurn)],gunUp[swapTurn(currentTurn)])
+                                obtainedItem = randomItem(extraUp[swapTurn(currentTurn)],chillUp[swapTurn(currentTurn)],gunUp[swapTurn(currentTurn)],extraUp[swapTurn(currentTurn)])
                                 if obtainedItem==0:
                                     extraUp[swapTurn(currentTurn)] = True
                                 if obtainedItem==1:
@@ -1341,7 +1547,8 @@ while close == False:
                                 if(player[currentTurn*3].isDead) and (player[1+currentTurn*3].isDead) and (player[2+currentTurn*3].isDead):
                                     #RESET GAME
                                     pygame.mixer.Sound.play(gameEnd)
-                                    gameOver()
+                                    userChoice = gameOver(userChoice[currentTurn])
+                                    
                                     for i in range(0,6):
                                         if(player[i].isDead):
                                             if(player[i].isMan):
@@ -1350,6 +1557,42 @@ while close == False:
                                                 player[i].reviveWoman()
                                             elif(player[i].isAlien):
                                                 player[i].reviveAlien()
+                                            if(i>=2):
+                                                player[i].flip()
+
+                                    if not(userChoice[0]==-1):
+                                        if(userChoice[0]==0):
+                                            player[0].becomeMan()
+                                            player[1].becomeMan()
+                                            player[2].becomeMan()
+                                        if(userChoice[0]==1):
+                                            player[0].becomeWoman()
+                                            player[1].becomeWoman()
+                                            player[2].becomeWoman()
+                                        elif(userChoice[0]==2):
+                                            player[0].becomeAlien()
+                                            player[1].becomeAlien()
+                                            player[2].becomeAlien()
+
+
+                                        if(userChoice[1]==0):
+                                            player[3].becomeMan()
+                                            player[4].becomeMan()
+                                            player[5].becomeMan()
+                                        if(userChoice[1]==1):
+                                            player[3].becomeWoman()
+                                            player[4].becomeWoman()
+                                            player[5].becomeWoman()
+                                        elif(userChoice[1]==2):
+                                            player[3].becomeAlien()
+                                            player[4].becomeAlien()
+                                            player[5].becomeAlien()
+
+                                        player[3].flip()
+                                        player[4].flip()
+                                        player[5].flip()
+
+                                        
                                     extraUp = [False, False]
                                     extraInButton = False
                                     extraActivated = [False, False]
@@ -1427,11 +1670,51 @@ while close == False:
                             if(player[swapTurn(currentTurn)*3].isDead) and (player[1+swapTurn(currentTurn)*3].isDead) and (player[2+swapTurn(currentTurn)*3].isDead):
                                 print("hi")
                                 pygame.mixer.Sound.play(gameEnd)
-                                gameOver()
+                                userChoice = gameOver(userChoice[currentTurn])
                                 #RESET GAME
                                 for i in range(0,6):
                                     if(player[i].isDead):
-                                        player[i].revive()
+                                        if(player[i].isWoman):
+                                            player[i].reviveWoman()
+                                        elif(player[i].isMan):
+                                            player[i].reviveMan()
+                                        elif(player[i].isAlien):
+                                            player[i].reviveAlien()
+                                        if(i>=2):
+                                            player[i].flip()
+
+                                if not(userChoice[0]==-1):
+                                    if(userChoice[0]==0):
+                                        player[0].becomeMan()
+                                        player[1].becomeMan()
+                                        player[2].becomeMan()
+                                    if(userChoice[0]==1):
+                                        player[0].becomeWoman()
+                                        player[1].becomeWoman()
+                                        player[2].becomeWoman()
+                                    elif(userChoice[0]==2):
+                                        player[0].becomeAlien()
+                                        player[1].becomeAlien()
+                                        player[2].becomeAlien()
+
+
+                                    if(userChoice[1]==1):
+                                        player[3].becomeWoman()
+                                        player[4].becomeWoman()
+                                        player[5].becomeWoman()
+                                    if(userChoice[1]==0):
+                                        player[3].becomeMan()
+                                        player[4].becomeMan()
+                                        player[5].becomeMan()
+                                    elif(userChoice[1]==2):
+                                        player[3].becomeAlien()
+                                        player[4].becomeAlien()
+                                        player[5].becomeAlien()
+
+                                    player[3].flip()
+                                    player[4].flip()
+                                    player[5].flip()
+                                
                                 extraUp = [False, False]
                                 extraInButton = False
                                 extraActivated = [False, False]
@@ -1618,7 +1901,7 @@ while close == False:
             
     font = pygame.font.Font('freesansbold.ttf', 20)
     if playerChosen == False:
-        screen.blit(font.render(textToSay, True, (0,0,0)), (0,0))
+        screen.blit(font.render(str(textToSay), True, black), (0,0))
 
     pygame.display.update()
         
