@@ -10,18 +10,19 @@ def swapTurn(currentTurn):
     return currentTurn
 
 
-def randomItem(extraUpPlayer,chillUpPlayer,gunUpPlayer):
+def randomItem(extraUpPlayer,chillUpPlayer,gunUpPlayer, potionUpPlayer):
 
-    listOfItems = [False, False, False]
+    listOfItems = [False, False, False, False]
     listOfItems[0] = extraUpPlayer
     listOfItems[1] = chillUpPlayer
     listOfItems[2] = gunUpPlayer
+    listOfItems[3] = potionUpPlayer
 
     currentCount = 0
     obtainedItem = 0
     possibleBonuses = 0
 
-    for i in range(0,3):
+    for i in range(0,4):
         if(not listOfItems[i]):
             possibleBonuses+=1
 
@@ -30,7 +31,7 @@ def randomItem(extraUpPlayer,chillUpPlayer,gunUpPlayer):
     
     randomNumber = random.randint(1,possibleBonuses)
     
-    for i in range(0,3):
+    for i in range(0,4):
         if(not listOfItems[i]):
             currentCount+=1
         if(currentCount==randomNumber):
@@ -103,6 +104,10 @@ class gun(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
     def draw(self, screen):
         screen.blit(self.image, self.rect)
+    def reset(self):
+        self.image = pygame.image.load('gun.png')
+    def swap(self):
+        self.image = pygame.transform.flip(self.image,True,False)
 
 
 class powerBar(pygame.sprite.Sprite):
@@ -209,14 +214,35 @@ class man(pygame.sprite.Sprite):
         self.image = pygame.image.load('man.png')
         self.rect = self.image.get_rect()
         self.isDead = False
+        self.isMan = True
+        self.isWoman = False
+        self.isAlien = False
+        
     def draw(self, screen):
         screen.blit(self.image, self.rect)
     def kill(self):
         self.image = pygame.image.load('dead.png')
         self.isDead = True
-    def revive(self):
+    def reviveMan(self):
         self.image = pygame.image.load('man.png')
         self.isDead = False
+    def reviveWoman(self):
+        self.image = pygame.image.load('woman.png')
+        self.isDead = False
+    def reviveAlien(self):
+        self.image = pygame.image.load('alien.png')
+        self.isDead = False       
+    def flip(self):
+        self.image = pygame.transform.flip(self.image,True,False)
+    def becomeWoman(self):
+        self.image = pygame.image.load('woman.png')
+        self.isMan = False
+        self.isWoman = True
+    def becomeAlien(self):
+        self.image = pygame.image.load('alien.png')
+        self.isMan = False
+        self.isAlien = True
+
         
 class button(pygame.sprite.Sprite):
     def __init__(self):
@@ -248,6 +274,53 @@ class againButton(pygame.sprite.Sprite):
         self.image = pygame.image.load('againButtonOver.png')
     def unhighlight(self):
         self.image = pygame.image.load('againButton.png')
+
+
+class backButton(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.id = 'backbtn'
+        self.x = 0
+        self.y = 0
+        self.image = pygame.image.load('backButton.png')
+        self.rect = self.image.get_rect()
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+    def highlight(self):
+        self.image = pygame.image.load('backButtonOver.png')
+    def unhighlight(self):
+        self.image = pygame.image.load('backButton.png')
+
+
+class nextButton(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.id = 'nextbtn'
+        self.x = 0
+        self.y = 0
+        self.image = pygame.image.load('nextButton.png')
+        self.rect = self.image.get_rect()
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+    def highlight(self):
+        self.image = pygame.image.load('nextButtonOver.png')
+    def unhighlight(self):
+        self.image = pygame.image.load('nextButton.png')
+
+class potionButton(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.id = 'potionbtn'
+        self.x = 0
+        self.y = 0
+        self.image = pygame.image.load('potion.png')
+        self.rect = self.image.get_rect()
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+    def highlight(self):
+        self.image = pygame.image.load('potionOver.png')
+    def unhighlight(self):
+        self.image = pygame.image.load('potion.png')
 
 
 class menuButton(pygame.sprite.Sprite):
@@ -360,6 +433,53 @@ class yesButton(pygame.sprite.Sprite):
         self.image = pygame.image.load('yesbuttonover.png')
     def unhighlight(self):
         self.image = pygame.image.load('yesbutton.png')
+
+
+class manButton(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.id = 'manbtn'
+        self.x = 0
+        self.y = 0
+        self.image = pygame.image.load('manbutton.png')
+        self.rect = self.image.get_rect()
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+    def highlight(self):
+        self.image = pygame.image.load('manbuttonover.png')
+    def unhighlight(self):
+        self.image = pygame.image.load('manbutton.png')
+
+class womanButton(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.id = 'womanbtn'
+        self.x = 0
+        self.y = 0
+        self.image = pygame.image.load('womanbutton.png')
+        self.rect = self.image.get_rect()
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+    def highlight(self):
+        self.image = pygame.image.load('womanbuttonover.png')
+    def unhighlight(self):
+        self.image = pygame.image.load('womanbutton.png')
+
+class otherButton(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.id = 'otherbtn'
+        self.x = 0
+        self.y = 0
+        self.image = pygame.image.load('otherbutton.png')
+        self.rect = self.image.get_rect()
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+    def highlight(self):
+        self.image = pygame.image.load('otherbuttonover.png')
+    def unhighlight(self):
+        self.image = pygame.image.load('otherbutton.png')
+
 
 
 class noButton(pygame.sprite.Sprite):
@@ -560,7 +680,7 @@ def mainMenu():
 
 def creditScreen():
     leaveMenu = False
-    menuBut = menuButton()
+    menuBut = backButton()
     menuBut.rect.x = 800
     menuBut.rect.y = 500
     isInButton = False
@@ -667,6 +787,63 @@ def gameOver():
         clock.tick(fps)  
 
 
+
+
+def playerSelection():
+    leaveMenu = False
+    otherBut = otherButton()
+    otherBut.rect.x = 100
+    otherBut.rect.y = 200
+    menuBut = backButton()
+    menuBut.rect.x = 200
+    menuBut.rect.y = 500
+    nextBut = nextButton()
+    nextBut.rect.x = 800
+    nextBut.rect.y = 500
+    isInMan = [True, True]
+    isInOther = [False, False]
+    isInWoman = [False, False]
+    isInButton = False
+    isInNext = False
+
+    
+    while (leaveMenu == False):
+        for event in pygame.event.get():
+            if event.type == firstOver:
+                pygame.mixer.music.load('loopsong.ogg')
+                pygame.mixer.music.play(-1)
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        clicked = pygame.mouse.get_pressed()
+        
+        screen.fill(white)
+        font = pygame.font.Font('freesansbold.ttf', 20)
+        screen.blit(font.render(str("Team 1:"), True, (0,0,0)), (0,0))
+        screen.blit(font.render(str("Team 2:"), True, (0,0,0)), (0,200))
+
+        mouse = pygame.mouse.get_pos()
+
+        
+        if menuBut.rect.collidepoint(mouse):
+            if(clicked[0] == 1):
+                leaveMenu=True
+            if(not isInButton): 
+               menuBut.highlight()
+               isInButton = True
+        if not(menuBut.rect.collidepoint(mouse)):
+            if(isInButton):    
+               menuBut.unhighlight()
+               isInButton = False
+
+        menuBut.draw(screen)
+        otherBut.draw(screen)
+        nextBut.draw(screen)
+        pygame.display.update()
+        clock.tick(fps)
+
+
+
 screenWidth = 1200
 screenHeight = 600
 gameTitle = "Snowball Fight"
@@ -728,6 +905,7 @@ snowList = pygame.sprite.Group()
 fabricList = pygame.sprite.Group()
 powerList = pygame.sprite.Group()
 chillList = pygame.sprite.Group()
+potionList = pygame.sprite.Group()
 gunButList = pygame.sprite.Group()
 bullList = pygame.sprite.Group()
 gunList = pygame.sprite.Group()
@@ -735,59 +913,99 @@ arrowList = pygame.sprite.Group()
 pwBarList = pygame.sprite.Group()
 
 
+
+distanceToBorder = 100
+distanceToHeight = 50
+
 player = [man() for i in range(6)]
-player[0].rect.x = 100
-player[0].rect.y = 300
+player[0].rect.x = distanceToBorder
+player[0].rect.y = distanceToHeight
 all_sprites_list.add(player[0])
-player[1].rect.x = 100
-player[1].rect.y = 500
+player[1].rect.x = distanceToBorder
+player[1].rect.y = screenHeight/2 - player[1].rect.height/2
 all_sprites_list.add(player[1])
-player[2].rect.x = 100
-player[2].rect.y = 100
+player[2].rect.x = distanceToBorder
+player[2].rect.bottom = screenHeight - distanceToHeight
 all_sprites_list.add(player[2])
-player[3].rect.x = 1000
-player[3].rect.y = 300
+player[3].rect.right = screenWidth-distanceToBorder
+player[3].rect.y = distanceToHeight
 all_sprites_list.add(player[3])
-player[4].rect.x = 1000
-player[4].rect.y = 500
+player[4].rect.right = screenWidth-distanceToBorder
+player[4].rect.y = screenHeight/2 - player[1].rect.height/2
 all_sprites_list.add(player[4])
-player[5].rect.x = 1000
-player[5].rect.y = 100
+player[5].rect.right = screenWidth-distanceToBorder
+player[5].rect.bottom = screenHeight - distanceToHeight
+
+
+userChoice = [1, 2]
+
+if(userChoice[0]==1):
+    player[0].becomeWoman()
+    player[1].becomeWoman()
+    player[2].becomeWoman()
+elif(userChoice[1]==2):
+    player[0].becomeAlien()
+    player[1].becomeAlien()
+    player[2].becomeAlien()
+
+
+if(userChoice[1]==1):
+    player[3].becomeWoman()
+    player[4].becomeWoman()
+    player[5].becomeWoman()
+elif(userChoice[1]==2):
+    player[3].becomeAlien()
+    player[4].becomeAlien()
+    player[5].becomeAlien()
+
+player[3].flip()
+player[4].flip()
+player[5].flip()
+
+
+
+
 all_sprites_list.add(player[5])
 scroll = scroller()
 scroll.rect.x = 550
 scroll.rect.y = 0
 all_sprites_list.add(scroll)
 fabr = fabric()
-fabr.rect.x = 550
+fabr.rect.x = (player[3].rect.right + player[0].rect.x)/2 - fabr.rect.width/2
 fabr.rect.y = 0
 fabricList.add(fabr)
 gifts = [gift() for i in range(3)]
-gifts[0].rect.x = 550
+gifts[0].rect.x = (player[3].rect.right + player[0].rect.x)/2 - fabr.rect.width/2
 gifts[0].rect.y = 500
 all_sprites_list.add(gifts[0])
-gifts[1].rect.x = 550
+gifts[1].rect.x = (player[3].rect.right + player[0].rect.x)/2 - fabr.rect.width/2
 gifts[1].rect.y = 300
 all_sprites_list.add(gifts[1])
-gifts[2].rect.x = 550
+gifts[2].rect.x = (player[3].rect.right + player[0].rect.x)/2 - fabr.rect.width/2
 gifts[2].rect.y = 100
 all_sprites_list.add(gifts[2])
 
 
 extraBtn = extraButton()
-extraBtn.rect.x = 90
-extraBtn.rect.y = 500
+extraBtn.rect.x = 200
+extraBtn.rect.y = 700
 powerList.add(extraBtn)
 
 chillBtn = chillButton()
-chillBtn.rect.x = 180
-chillBtn.rect.y = 500
+chillBtn.rect.x = 200
+chillBtn.rect.y = 600
 chillList.add(chillBtn)
 
 gunBtn = gunButton()
-gunBtn.rect.x = 270
+gunBtn.rect.x = 200
 gunBtn.rect.y = 500
 gunButList.add(gunBtn)
+
+potionBtn = potionButton()
+potionBtn.rect.x = 200
+potionBtn.rect.y = 500
+potionList.add(potionBtn)
+
 
 bull = bullet()
 bull.rect.x = 0
@@ -823,15 +1041,18 @@ arrowHeight = arrowObj.rect.height
 arrowWidth = arrowObj.rect.width
 
 
-extraUp = [False, False]
+extraUp = [True, False]
 extraInButton = False
 extraActivated = [False, False]
-chillUp = [False, False]
+chillUp = [True, False]
 chillInButton = False
 chillActivated = [False, False]
-gunUp = [False, False]
+gunUp = [True, True]
 gunInButton = False
 gunActivated = [False, False]
+potionUp = [True, False]
+potionInButton = False
+potionActivated = [False, False]
 
 
 playerDied = False
@@ -865,14 +1086,22 @@ posY = 0
 isInButton = False
 gameEnded = False
 angle=0
+textToSay = "Select Player"
 
-
+playerSelection()
 mainMenu()
 
 
 
 
+
 while close == False:
+
+    
+    buttonUp = False
+    waitingForRevive = False
+    potionJustUsed = False
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             close = True
@@ -897,8 +1126,10 @@ while close == False:
                         ballX = player[selectedPlayer+currentTurn*3].rect.x + 25
                         ballY = player[selectedPlayer+currentTurn*3].rect.y + 15
                         pygame.mixer.Sound.play(snowThrow)
+        if event.type == pygame.MOUSEBUTTONUP:
+            buttonUp = True
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if not(extraBtn.rect.collidepoint(mouse) and extraUp[currentTurn]) or (not(gunBtn.rect.collidepoint(mouse) and gunUp[currentTurn])) or (not(chillBtn.rect.collidepoint(mouse) and chillUp[currentTurn])):
+            if (not(potionBtn.rect.collidepoint(mouse) and potionUp[currentTurn])) or (not(extraBtn.rect.collidepoint(mouse) and extraUp[currentTurn])) or (not(gunBtn.rect.collidepoint(mouse) and gunUp[currentTurn])) or (not(chillBtn.rect.collidepoint(mouse) and chillUp[currentTurn])):
                 if playerChosen == True:
                     if lineAngleStop == False:
                         lineAngleStop = True
@@ -910,7 +1141,6 @@ while close == False:
                         lineDoneStop = True
                         if currentTurn==1:
                             heightAngle = heightLineClock*2*math.pi/lineHeightTime + angle
-
                         initialHSpeed = abs(lineSize*math.cos(heightAngle-angle)/2)
                         ballX = player[selectedPlayer+currentTurn*3].rect.x + 25
                         ballY = player[selectedPlayer+currentTurn*3].rect.y + 15
@@ -924,6 +1154,32 @@ while close == False:
         lineHeightTime = 4
         lineSizeTime = 2
         chillActivated[currentTurn] = False
+
+    if(potionActivated[currentTurn]):
+        waitingForRevive = True
+        if( (not player[currentTurn*3].isDead) and (not player[1 + currentTurn*3].isDead) and (not player[2+currentTurn*3].isDead)):
+            potionActivated[currentTurn] = False
+            potionUp[currentTurn] = True
+            textToSay = "All players are alive"
+            waitingForRevive = False
+        else:
+            textToSay = "Select a player to revive"
+            for i in range(0,3):
+                if player[i+currentTurn*3].rect.collidepoint(mouse):
+                    if(buttonUp) and (player[i+currentTurn*3].isDead):
+                        buttonUp = False
+                        if(player[i+currentTurn*3].isMan):
+                            player[i+currentTurn*3].reviveMan()
+                        elif(player[i+currentTurn*3].isWoman):
+                            player[i+currentTurn*3].reviveWoman()
+                        elif(player[i+currentTurn*3].isAlien):
+                            player[i+currentTurn*3].reviveAlien()
+                            
+                        potionActivated[currentTurn] = False
+                        waitingForRevive = False
+                        textToSay = "Select Player"
+                        
+
     
     
     scrollCounter += 1
@@ -941,149 +1197,238 @@ while close == False:
     all_sprites_list.draw(screen)
     fabricList.update()
     fabricList.draw(screen)
-    
-    if playerChosen == False:
-        click = pygame.mouse.get_pressed()
-        mouse = pygame.mouse.get_pos()
-        for i in range(0,3):
-          if player[i+currentTurn*3].rect.collidepoint(mouse):
-              if(click[0] == 1) and (not player[i+currentTurn*3].isDead):
-                selectedPlayer = i
-                playerChosen = True
-    else:      
-            
-        if lineDoneStop == False:
-    
-            if gunActivated[currentTurn]:
-                gunObj.rect.x = player[selectedPlayer+currentTurn*3].rect.x
-                gunObj.rect.y = player[selectedPlayer+currentTurn*3].rect.y+10
-                gunList.update()
-                gunList.draw(screen)
-            
-            if lineAngleStop == False:
-                    
-                if lineClock >= lineAngleTime * angleBoundary / (2*math.pi):
-                    angleDirection = -1
-                if lineClock <= -lineAngleTime * angleBoundary / (2*math.pi):
-                    angleDirection = 1
+
+    if(not waitingForRevive):
+        if playerChosen == False:
+            mouse = pygame.mouse.get_pos()
+            for i in range(0,3):
+              if player[i+currentTurn*3].rect.collidepoint(mouse):
+                  if(buttonUp) and (not player[i+currentTurn*3].isDead):
+                    selectedPlayer = i
+                    playerChosen = True
+        else:      
+            textToSay = "Select Player"
+            if lineDoneStop == False:
+        
+                if gunActivated[currentTurn]:
+                    gunObj.rect.x = player[selectedPlayer+currentTurn*3].rect.x
+                    gunObj.rect.y = player[selectedPlayer+currentTurn*3].rect.y+10
+                    gunList.update()
+                    gunList.draw(screen)
+                
+                if lineAngleStop == False:
                         
-                    
-                lineClock += angleDirection/(fps*lineAngleTime)
-                angle = lineClock*2*math.pi/lineAngleTime + math.pi/2
-
-                if currentDirection == -1:
-                    angle += math.pi
-            if (lineAngleStop == True) and (gunActivated[currentTurn]):
-                lineSizeStop = True
-                lineDoneStop = True
-                ballX = player[selectedPlayer+currentTurn*3].rect.x+25
-                ballY = player[selectedPlayer+currentTurn*3].rect.y+15
-                bull.rotate(math.degrees(angle-math.pi/2), ballX, ballY)
-                pygame.mixer.Sound.play(gunShot)
-                
-            if (lineAngleStop == True) and (lineSizeStop == False):
-                if lineSize < minimumSize:
-                    sizeDirection = 1
-                if lineSize > maximumSize:
-                    sizeDirection = -1
-                lineSize += sizeDirection*(maximumSize-minimumSize)/(fps*lineSizeTime)
-
-            if (lineAngleStop == True) and (lineSizeStop == True):
-                if heightLineClock >= lineHeightTime * heightBoundary / (2*math.pi):
-                    heightDirection = -1
-                if heightLineClock <= -heightDirection/(fps*lineAngleTime):
-                    heightDirection= 1
-                    
-                heightLineClock += heightDirection/(fps*lineAngleTime)
-                heightAngle = heightLineClock*2*math.pi/lineHeightTime + angle - currentTurn*math.pi/2
-                trueY = maximumSize * math.cos(heightAngle)
-                trueX = maximumSize * math.sin(heightAngle)
-                if currentDirection == -1:
-                    heightAngle -= heightBoundary
-                yAngleLine = lineSize * math.cos(heightAngle)
-                xAngleLine = lineSize * math.sin(heightAngle)
-                pygame.draw.line(screen, black, (player[selectedPlayer+currentTurn*3].rect.x+25, player[selectedPlayer+currentTurn*3].rect.y+15), (trueX + player[selectedPlayer+currentTurn*3].rect.x + 25, trueY + player[selectedPlayer+currentTurn*3].rect.y + 20), 4)
-            yLine = lineSize * math.cos(angle)
-            xLine = lineSize * math.sin(angle)
-
-            #LINE PROCESSS
-            #
-            #
-            
-
-            if(not lineAngleStop):
-                
-                if(currentTurn==0):
-                    arrowObj.reset()
-                    arrowObj.rotate(math.degrees(abs(angle-math.pi/2)), player[selectedPlayer+currentTurn*3].rect.x+25, player[selectedPlayer+currentTurn*3].rect.y+15-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight)
-                    if(angle-math.pi/2 -currentTurn*math.pi)<0:
-                        arrowObj.flip(player[selectedPlayer+currentTurn*3].rect.y+15-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight+arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi)))
-                    
-                else:
-                    arrowObj.resetLeft()
-                    arrowObj.rotateLeft(math.degrees(-abs(angle-3*math.pi/2)), player[selectedPlayer+currentTurn*3].rect.x+25, player[selectedPlayer+currentTurn*3].rect.y+15-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight)
-                    if(angle-math.pi/2 -currentTurn*math.pi)<0:
-                        arrowObj.flip(player[selectedPlayer+currentTurn*3].rect.y+15-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight+arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi)))
-            arrowList.update()
-            arrowList.draw(screen)
-
-
-            
-            if(lineAngleStop):
-                power.reset()
-                power.scale((lineSize/maximumSize)*power.rect.width,powerHeight)
-                powerHold.rect.x = player[selectedPlayer+currentTurn*3].rect.x - player[selectedPlayer+currentTurn*3].rect.width/2
-                powerHold.rect.y = player[selectedPlayer+currentTurn*3].rect.y + 60
-                power.rect.x = player[selectedPlayer+currentTurn*3].rect.x - player[selectedPlayer+currentTurn*3].rect.width/2
-                power.rect.y = player[selectedPlayer+currentTurn*3].rect.y + 60
-            
-                pwBarList.update()
-                pwBarList.draw(screen)
-    
-        else:
-            if(not gunActivated[currentTurn]):
-                if (height > 0):
-                    timer += 1/fps
-                    height += initialHSpeed - gravity*timer
-                    ballX += lineSize*math.sin(angle)*fps/300
-                    ballY += bounce*lineSize*math.cos(angle)*fps/300
-                    screen.blit(shadowImg,(ball.rect.x+abs(height)*0.01,+ball.rect.y+abs(height)*0.005))
-                    ball.rect.x = ballX
-                    ball.rect.y = ballY
-                if (ball.rect.y > screenHeight-ball.rect.height):
-                    if bouncedDown == False:
-                        bounce *= -1
-                        bouncedDown = True
-                        bouncedUp = False
-                        pygame.mixer.Sound.play(ballBounce)
-                if (ball.rect.y<0):
-                    if bouncedUp == False:
-                        bounce *= -1
-                        bouncedUp = True
-                        bouncedDown = False
-                        pygame.mixer.Sound.play(ballBounce)
-                   
-                if(height <= 0) or (ball.rect.right<0) or (ball.rect.x>screenWidth):
-                    pygame.mixer.Sound.play(snowFall)
-                    currentTurn = swapTurn(currentTurn)
-                    currentDirection *= -1
-                    for i in range(0,3):
-                        if (ball.collides(gifts[i]) and ball.rect.bottom>=100):
-                            pygame.mixer.Sound.play(presentSound)
-                            obtainedItem = randomItem(extraUp[swapTurn(currentTurn)],chillUp[swapTurn(currentTurn)],gunUp[swapTurn(currentTurn)])
-                            if obtainedItem==0:
-                                extraUp[swapTurn(currentTurn)] = True
-                            if obtainedItem==1:
-                                chillUp[swapTurn(currentTurn)] = True
-                            if obtainedItem==2:
-                                gunUp[swapTurn(currentTurn)] = True
+                    if lineClock >= lineAngleTime * angleBoundary / (2*math.pi):
+                        angleDirection = -1
+                    if lineClock <= -lineAngleTime * angleBoundary / (2*math.pi):
+                        angleDirection = 1
                             
-                        if (ball.collides(player[i+currentTurn*3])) and (not player[i+currentTurn*3].isDead):
-                            player[i+currentTurn*3].kill()
-                            if(player[currentTurn*3].isDead) and (player[1+currentTurn*3].isDead) and (player[2+currentTurn*3].isDead):
-                                #RESET GAME
+                        
+                    lineClock += angleDirection/(fps*lineAngleTime)
+                    angle = lineClock*2*math.pi/lineAngleTime + math.pi/2
+
+                    if currentDirection == -1:
+                        angle += math.pi
+                if (lineAngleStop == True) and (gunActivated[currentTurn]):
+                    lineSizeStop = True
+                    lineDoneStop = True
+                    ballX = player[selectedPlayer+currentTurn*3].rect.x+25
+                    ballY = player[selectedPlayer+currentTurn*3].rect.y+15
+                    bull.rotate(math.degrees(angle-math.pi/2), ballX, ballY)
+                    pygame.mixer.Sound.play(gunShot)
+                    
+                if (lineAngleStop == True) and (lineSizeStop == False):
+                    if lineSize < minimumSize:
+                        sizeDirection = 1
+                    if lineSize > maximumSize:
+                        sizeDirection = -1
+                    lineSize += sizeDirection*(maximumSize-minimumSize)/(fps*lineSizeTime)
+
+                if (lineAngleStop == True) and (lineSizeStop == True):
+                    if heightLineClock >= lineHeightTime * heightBoundary / (2*math.pi):
+                        heightDirection = -1
+                    if heightLineClock <= -heightDirection/(fps*lineAngleTime):
+                        heightDirection= 1
+                        
+                    heightLineClock += heightDirection/(fps*lineAngleTime)
+                    heightAngle = heightLineClock*2*math.pi/lineHeightTime + angle - currentTurn*math.pi/2
+                    trueY = maximumSize * math.cos(heightAngle)
+                    trueX = maximumSize * math.sin(heightAngle)
+                    if currentDirection == -1:
+                        heightAngle -= heightBoundary
+                    yAngleLine = lineSize * math.cos(heightAngle)
+                    xAngleLine = lineSize * math.sin(heightAngle)
+                    pygame.draw.line(screen, black, (player[selectedPlayer+currentTurn*3].rect.x+25, player[selectedPlayer+currentTurn*3].rect.y+15), (trueX + player[selectedPlayer+currentTurn*3].rect.x + 25, trueY + player[selectedPlayer+currentTurn*3].rect.y + 20), 4)
+                yLine = lineSize * math.cos(angle)
+                xLine = lineSize * math.sin(angle)
+
+                #LINE PROCESSS
+                #
+                #
+                
+
+                if(not lineAngleStop):
+                    
+                    if(currentTurn==0):
+                        arrowObj.reset()
+                        arrowObj.rotate(math.degrees(abs(angle-math.pi/2)), player[selectedPlayer+currentTurn*3].rect.x+25, player[selectedPlayer+currentTurn*3].rect.y+15-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight)
+                        if(angle-math.pi/2 -currentTurn*math.pi)<0:
+                            arrowObj.flip(player[selectedPlayer+currentTurn*3].rect.y+15-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight+arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi)))
+                        
+                    else:
+                        arrowObj.resetLeft()
+                        arrowObj.rotateLeft(math.degrees(-abs(angle-3*math.pi/2)), player[selectedPlayer+currentTurn*3].rect.x+25, player[selectedPlayer+currentTurn*3].rect.y+15-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight)
+                        if(angle-math.pi/2 -currentTurn*math.pi)<0:
+                            arrowObj.flip(player[selectedPlayer+currentTurn*3].rect.y+15-arrowHeight*math.cos(abs(angle-math.pi/2-currentTurn*math.pi))-arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi))+arrowHeight+arrowWidth*math.sin(abs(angle-math.pi/2-currentTurn*math.pi)))
+                arrowList.update()
+                arrowList.draw(screen)
+
+
+                
+                if(lineAngleStop):
+                    power.reset()
+                    power.scale((lineSize/maximumSize)*power.rect.width,powerHeight)
+                    powerHold.rect.x = player[selectedPlayer+currentTurn*3].rect.x - player[selectedPlayer+currentTurn*3].rect.width/2
+                    powerHold.rect.y = player[selectedPlayer+currentTurn*3].rect.y + 60
+                    power.rect.x = player[selectedPlayer+currentTurn*3].rect.x - player[selectedPlayer+currentTurn*3].rect.width/2
+                    power.rect.y = player[selectedPlayer+currentTurn*3].rect.y + 60
+                
+                    pwBarList.update()
+                    pwBarList.draw(screen)
+        
+            else:
+                if(not gunActivated[currentTurn]):
+                    if (height > 0):
+                        timer += 1/fps
+                        height += initialHSpeed - gravity*timer
+                        ballX += lineSize*math.sin(angle)*fps/300
+                        ballY += bounce*lineSize*math.cos(angle)*fps/300
+                        screen.blit(shadowImg,(ball.rect.x+abs(height)*0.01,+ball.rect.y+abs(height)*0.005))
+                        ball.rect.x = ballX
+                        ball.rect.y = ballY
+                    if (ball.rect.y > screenHeight-ball.rect.height):
+                        if bouncedDown == False:
+                            bounce *= -1
+                            bouncedDown = True
+                            bouncedUp = False
+                            pygame.mixer.Sound.play(ballBounce)
+                    if (ball.rect.y<0):
+                        if bouncedUp == False:
+                            bounce *= -1
+                            bouncedUp = True
+                            bouncedDown = False
+                            pygame.mixer.Sound.play(ballBounce)
+                       
+                    if(height <= 0) or (ball.rect.right<0) or (ball.rect.x>screenWidth):
+                        pygame.mixer.Sound.play(snowFall)
+                        currentTurn = swapTurn(currentTurn)
+                        currentDirection *= -1
+                        for i in range(0,3):
+                            if (ball.collides(gifts[i]) and ball.rect.bottom>=100):
+                                pygame.mixer.Sound.play(presentSound)
+                                obtainedItem = randomItem(extraUp[swapTurn(currentTurn)],chillUp[swapTurn(currentTurn)],gunUp[swapTurn(currentTurn)])
+                                if obtainedItem==0:
+                                    extraUp[swapTurn(currentTurn)] = True
+                                if obtainedItem==1:
+                                    chillUp[swapTurn(currentTurn)] = True
+                                if obtainedItem==2:
+                                    gunUp[swapTurn(currentTurn)] = True
+                                if obtainedItem==3:
+                                    potionUp[swapTurn(currentTurn)] = True
+                                
+                            if (ball.collides(player[i+currentTurn*3])) and (not player[i+currentTurn*3].isDead):
+                                player[i+currentTurn*3].kill()
+                                if(player[currentTurn*3].isDead) and (player[1+currentTurn*3].isDead) and (player[2+currentTurn*3].isDead):
+                                    #RESET GAME
+                                    pygame.mixer.Sound.play(gameEnd)
+                                    gameOver()
+                                    for i in range(0,6):
+                                        if(player[i].isDead):
+                                            if(player[i].isMan):
+                                                player[i].reviveMan()
+                                            elif(player[i].isWoman):
+                                                player[i].reviveWoman()
+                                            elif(player[i].isAlien):
+                                                player[i].reviveAlien()
+                                    extraUp = [False, False]
+                                    extraInButton = False
+                                    extraActivated = [False, False]
+                                    chillUp = [False, False]
+                                    chillInButton = False
+                                    chillActivated = [False, False]
+                                    gunUp = [False, False]
+                                    gunInButton = False
+                                    gunActivated = [False, False]
+                                    potionUp = [False, False]
+                                    potionInButton = False
+                                    potionActivated = [False, False]
+                                    currentTurn = 0
+                                    currentDirection = 1
+                                    ###
+
+
+                                        
+                        #RESET VARIABLES
+                        #
+                        lineDoneStop=False
+                        lineAngleStop = False
+                        lineSizeStop =  False
+                        heightAngle = 0
+                        height = 0.5
+                        lineClock = 0
+                        heightLineClock = 0
+                        angleDirection = 1
+                        sizeDirection = -1
+                        heightDirection = 1
+                        yLine = 0
+                        xLine = 50
+                        timer = 0
+                        bouncedUp = False
+                        bouncedDown = False
+                        bounce = 1
+                        lineSize = 50
+                        playerChosen = False
+                        lineAngleTime = lineAngleTimeStd
+                        lineHeightTime = lineHeightTimeStd
+                        lineSizeTime = lineSizeTimeStd
+                        #
+                        #RESET VARIABLES
+
+                    snowList.update()
+                    snowList.draw(screen)
+
+                else:
+                    ballX += lineSize*math.sin(angle)*fps/150
+                    ballY += bounce*lineSize*math.cos(angle)*fps/150
+                    bull.rect.x = ballX
+                    bull.rect.y = ballY
+                    
+                    if (bull.rect.y > screenHeight-bull.rect.height):
+                        if bouncedDown == False:
+                            pygame.mixer.Sound.play(bulletBounce)
+                            bounce *= -1
+                            bouncedDown = True
+                            bouncedUp = False
+                            bull.reset()
+                            bull.rotate(bounce*math.degrees(angle-math.pi/2), ballX, ballY)
+                    if (bull.rect.y<0):
+                        if bouncedUp == False:
+                            pygame.mixer.Sound.play(bulletBounce)
+                            bounce *= -1
+                            bouncedUp = True
+                            bouncedDown = False
+                            bull.reset()
+                            bull.rotate(bounce*math.degrees(angle-math.pi/2), ballX, ballY)
+
+                    for i in range(0,3):
+                            if (bull.collides(player[i+swapTurn(currentTurn)*3])) and (not player[i+swapTurn(currentTurn)*3].isDead):
+                                player[i+swapTurn(currentTurn)*3].kill()
+                                playerDied = True
+                            if(player[swapTurn(currentTurn)*3].isDead) and (player[1+swapTurn(currentTurn)*3].isDead) and (player[2+swapTurn(currentTurn)*3].isDead):
+                                print("hi")
                                 pygame.mixer.Sound.play(gameEnd)
                                 gameOver()
+                                #RESET GAME
                                 for i in range(0,6):
                                     if(player[i].isDead):
                                         player[i].revive()
@@ -1096,156 +1441,88 @@ while close == False:
                                 gunUp = [False, False]
                                 gunInButton = False
                                 gunActivated = [False, False]
+                                potionUp = [False, False]
+                                potionInButton = False
+                                potionActivated = [False, False]
                                 currentTurn = 0
                                 currentDirection = 1
+                                gameEnded = True
                                 ###
-
-
-                                    
-                    #RESET VARIABLES
-                    #
-                    lineDoneStop=False
-                    lineAngleStop = False
-                    lineSizeStop =  False
-                    heightAngle = 0
-                    height = 0.5
-                    lineClock = 0
-                    heightLineClock = 0
-                    angleDirection = 1
-                    sizeDirection = -1
-                    heightDirection = 1
-                    yLine = 0
-                    xLine = 50
-                    timer = 0
-                    bouncedUp = False
-                    bouncedDown = False
-                    bounce = 1
-                    lineSize = 50
-                    playerChosen = False
-                    lineAngleTime = lineAngleTimeStd
-                    lineHeightTime = lineHeightTimeStd
-                    lineSizeTime = lineSizeTimeStd
-                    #
-                    #RESET VARIABLES
-
-                snowList.update()
-                snowList.draw(screen)
-
-            else:
-                ballX += lineSize*math.sin(angle)*fps/150
-                ballY += bounce*lineSize*math.cos(angle)*fps/150
-                bull.rect.x = ballX
-                bull.rect.y = ballY
+                                
+                                
+                    
+                    
                 
-                if (bull.rect.y > screenHeight-bull.rect.height):
-                    if bouncedDown == False:
-                        pygame.mixer.Sound.play(bulletBounce)
-                        bounce *= -1
-                        bouncedDown = True
+                    if (bull.rect.x+bull.rect.width>=screenWidth) or (bull.rect.x <= 0) or (playerDied):
+                        gunActivated[currentTurn] = False
+                        currentTurn = swapTurn(currentTurn)
+                        currentDirection *= -1
+                        #RESET VARIABLES
+                        #
+                        playerDied = False
+                        lineDoneStop=False
+                        lineAngleStop = False
+                        lineSizeStop =  False
+                        heightAngle = 0
+                        height = 0.5
+                        lineClock = 0
+                        heightLineClock = 0
+                        angleDirection = 1
+                        sizeDirection = -1
+                        heightDirection = 1
+                        yLine = 0
+                        xLine = 50
+                        timer = 0
                         bouncedUp = False
-                        bull.reset()
-                        bull.rotate(bounce*math.degrees(angle-math.pi/2), ballX, ballY)
-                if (bull.rect.y<0):
-                    if bouncedUp == False:
-                        pygame.mixer.Sound.play(bulletBounce)
-                        bounce *= -1
-                        bouncedUp = True
                         bouncedDown = False
+                        bounce = 1
+                        lineSize = 50
+                        playerChosen = False
+                        lineAngleTime = lineAngleTimeStd
+                        lineHeightTime = lineHeightTimeStd
+                        lineSizeTime = lineSizeTimeStd
                         bull.reset()
-                        bull.rotate(bounce*math.degrees(angle-math.pi/2), ballX, ballY)
-
-                for i in range(0,3):
-                        if (bull.collides(player[i+swapTurn(currentTurn)*3])) and (not player[i+swapTurn(currentTurn)*3].isDead):
-                            player[i+swapTurn(currentTurn)*3].kill()
-                            playerDied = True
-                        if(player[swapTurn(currentTurn)*3].isDead) and (player[1+swapTurn(currentTurn)*3].isDead) and (player[2+swapTurn(currentTurn)*3].isDead):
-                            print("hi")
-                            pygame.mixer.Sound.play(gameEnd)
-                            gameOver()
-                            #RESET GAME
-                            for i in range(0,6):
-                                if(player[i].isDead):
-                                    player[i].revive()
-                            extraUp = [False, False]
-                            extraInButton = False
-                            extraActivated = [False, False]
-                            chillUp = [False, False]
-                            chillInButton = False
-                            chillActivated = [False, False]
-                            gunUp = [False, False]
-                            gunInButton = False
-                            gunActivated = [False, False]
+                        if(gameEnded):
                             currentTurn = 0
                             currentDirection = 1
-                            gameEnded = True
-                            ###
-                            
-                            
-                
-                
-            
-                if (bull.rect.x+bull.rect.width>=screenWidth) or (bull.rect.x <= 0) or (playerDied):
-                    gunActivated[currentTurn] = False
-                    currentTurn = swapTurn(currentTurn)
-                    currentDirection *= -1
-                    #RESET VARIABLES
-                    #
-                    playerDied = False
-                    lineDoneStop=False
-                    lineAngleStop = False
-                    lineSizeStop =  False
-                    heightAngle = 0
-                    height = 0.5
-                    lineClock = 0
-                    heightLineClock = 0
-                    angleDirection = 1
-                    sizeDirection = -1
-                    heightDirection = 1
-                    yLine = 0
-                    xLine = 50
-                    timer = 0
-                    bouncedUp = False
-                    bouncedDown = False
-                    bounce = 1
-                    lineSize = 50
-                    playerChosen = False
-                    lineAngleTime = lineAngleTimeStd
-                    lineHeightTime = lineHeightTimeStd
-                    lineSizeTime = lineSizeTimeStd
-                    bull.reset()
-                    if(gameEnded):
-                        currentTurn = 0
-                        currentDirection = 1
-                        gameEnded = False
-                    #
-                    #RESET VARIABLES
-                  
-                gunList.update()
-                gunList.draw(screen)    
-                bullList.update()
-                bullList.draw(screen)
-                
-
-                
+                            gameEnded = False
+                        #
+                        #RESET VARIABLES
+                      
+                    gunList.update()
+                    gunList.draw(screen)    
+                    bullList.update()
+                    bullList.draw(screen)
+                    
 
                     
-            if(extraActivated[swapTurn(currentTurn)]):
-                currentTurn = swapTurn(currentTurn)
-                currentDirection *= -1
-                extraActivated[currentTurn] = False
+
+                        
+                if(extraActivated[swapTurn(currentTurn)]):
+                    currentTurn = swapTurn(currentTurn)
+                    currentDirection *= -1
+                    extraActivated[currentTurn] = False
 
 
 
         
-                    
-
+    
+    currentPos = 500
 
     
     if (extraUp[currentTurn] and (not playerChosen)):
+        if(currentTurn==1):
+            extraBtn.rect.right = screenWidth - 200   
+        else:
+            extraBtn.rect.x = 200
+            
+        extraBtn.rect.y = currentPos
+        currentPos -= 40
         powerList.update()
         powerList.draw(screen)
         if extraBtn.rect.collidepoint(mouse):
-            if(clicked[0] == 1):
+            if(buttonUp):
+                buttonUp = False
                 extraActivated[currentTurn] = True
                 extraUp[currentTurn] = False
             if(not extraInButton): 
@@ -1257,10 +1534,19 @@ while close == False:
                 extraInButton = False    
 
     if (chillUp[currentTurn] and (not playerChosen)):
+        if(currentTurn==1):
+            chillBtn.rect.right = screenWidth - 200   
+        else:
+            chillBtn.rect.x = 200
+
+        chillBtn.rect.y = currentPos
+        currentPos -= 40
+        
         chillList.update()
         chillList.draw(screen)
         if chillBtn.rect.collidepoint(mouse):
-            if(clicked[0] == 1):
+            if(buttonUp):
+                buttonUp = False
                 chillActivated[currentTurn] = True
                 chillUp[currentTurn] = False
             if(not chillInButton): 
@@ -1273,13 +1559,27 @@ while close == False:
 
 
     if (gunUp[currentTurn] and (not playerChosen)):
+    
+        if(currentTurn==1):
+            gunBtn.rect.right = screenWidth - 200   
+        else:
+            gunBtn.rect.x = 200
+
+        gunBtn.rect.y = currentPos
+        currentPos -= 40
+        
         gunButList.update()
         gunButList.draw(screen)
         if gunBtn.rect.collidepoint(mouse):
-            if(clicked[0] == 1):
+            if(buttonUp):
+                buttonUp = False
                 pygame.mixer.Sound.play(gunActivationSound)
                 gunActivated[currentTurn] = True
                 gunUp[currentTurn] = False
+                if(currentTurn==1):
+                    gunObj.swap()
+                else:
+                    gunObj.reset()
             if(not gunInButton): 
                 gunBtn.highlight()
                 gunInButton = True
@@ -1289,14 +1589,37 @@ while close == False:
                 gunInButton = False
 
 
+    if (potionUp[currentTurn] and (not playerChosen)):
+    
+        if(currentTurn==1):
+            potionBtn.rect.right = screenWidth - 200   
+        else:
+            potionBtn.rect.x = 200
+
+        potionBtn.rect.y = currentPos
+        currentPos -= 40
+        
+        potionList.update()
+        potionList.draw(screen)
+        if potionBtn.rect.collidepoint(mouse):
+            if(buttonUp):
+                buttonUp = False
+                potionActivated[currentTurn] = True
+                potionUp[currentTurn] = False
+            if(not potionInButton): 
+                potionBtn.highlight()
+                potionInButton = True
+        if not(potionBtn.rect.collidepoint(mouse)):
+            if(potionInButton):    
+                potionBtn.unhighlight()
+                potionInButton = False
+
+
             
     font = pygame.font.Font('freesansbold.ttf', 20)
     if playerChosen == False:
-        screen.blit(font.render(str("Select Player"), True, (0,0,0)), (0,0))
-    else:
-        screen.blit(font.render(str(-math.degrees(angle-math.pi/2 -currentTurn*math.pi)), True, (0,0,0)), (0,0))
-        screen.blit(font.render(str(math.degrees(angle)), True, (0,0,0)), (0,50))
-        
+        screen.blit(font.render(textToSay, True, (0,0,0)), (0,0))
+
     pygame.display.update()
         
 pygame.quit()
